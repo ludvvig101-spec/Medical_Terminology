@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MedLego · Build Medical Terms with Bricks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* --- Same styles as before, no changes needed --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --lego-red: #c91a1a; --lego-red-dark: #8a1111; --lego-yellow: #f5cd2b; --lego-yellow-dark: #b39700; --lego-blue: #006db7; --lego-blue-dark: #004a7a; --lego-green: #00a651; --lego-green-dark: #1d7a3a; --lego-orange: #faa61a; --lego-orange-dark: #b87a0a; --lego-purple: #7c5cbf; --lego-purple-dark: #4a2a7a; --lego-light-bg: #f0ebe3; --lego-card-bg: #ffffff; --lego-shadow: 0 8px 0 rgba(0,0,0,0.15), 0 12px 40px rgba(0,0,0,0.15); --border-radius-lg: 24px; --font-lego: 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', sans-serif; }
+        body { background: var(--lego-light-bg); min-height: 100vh; padding: 1.5rem; display: flex; justify-content: center; align-items: flex-start; background-image: radial-gradient(circle at 20% 30%, rgba(245,205,43,0.08) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(0,109,183,0.06) 0%, transparent 50%); }
+        .lego-container { max-width: 1200px; width: 100%; }
+        .lego-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem; background: var(--lego-card-bg); padding: 0.8rem 2rem; border-radius: 60px; box-shadow: var(--lego-shadow); border: 3px solid #e0d6c8; position: relative; }
+        .lego-header::before { content: ''; position: absolute; top: -4px; left: 30px; right: 30px; height: 8px; background: repeating-linear-gradient(90deg, var(--lego-red) 0px, var(--lego-red) 16px, var(--lego-yellow) 16px, var(--lego-yellow) 32px, var(--lego-blue) 32px, var(--lego-blue) 48px, var(--lego-green) 48px, var(--lego-green) 64px); border-radius: 4px 4px 0 0; }
+        .logo-area { display: flex; align-items: center; gap: 0.8rem; }
+        .logo-icon { background: var(--lego-yellow); color: var(--lego-dark); font-weight: 900; font-size: 2rem; padding: 0.2rem 0.8rem; border-radius: 16px; box-shadow: 0 6px 0 var(--lego-yellow-dark), inset 0 2px 0 rgba(255,255,255,0.3); transform: rotate(-2deg); border: 2px solid var(--lego-yellow-dark); }
+        .logo-text { font-size: 2rem; font-weight: 900; letter-spacing: -0.5px; color: var(--lego-dark); font-family: var(--font-lego); }
+        .logo-text span { background: var(--lego-red); color: white; padding: 0.1rem 0.8rem; border-radius: 40px; font-size: 1.4rem; margin-left: 0.2rem; box-shadow: 0 4px 0 var(--lego-red-dark); }
+        .builder-badge { background: var(--lego-dark); color: white; padding: 0.4rem 1.5rem; border-radius: 60px; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 0.6rem; border: 3px solid var(--lego-yellow); box-shadow: inset 0 -3px 0 #555; font-family: var(--font-lego); }
+        .builder-badge i { color: var(--lego-yellow); font-size: 1.2rem; }
+        .lego-progress { background: #d9d0c0; border-radius: 40px; height: 28px; width: 100%; margin-bottom: 1.5rem; border: 4px solid #b8ae9c; overflow: hidden; position: relative; box-shadow: inset 0 3px 8px rgba(0,0,0,0.1); }
+        .lego-progress-fill { height: 100%; background: repeating-linear-gradient(90deg, var(--lego-red) 0px, var(--lego-red) 20px, var(--lego-yellow) 20px, var(--lego-yellow) 40px, var(--lego-blue) 40px, var(--lego-blue) 60px, var(--lego-green) 60px, var(--lego-green) 80px); border-radius: 40px; transition: width 0.5s ease; width: 0%; box-shadow: inset 0 2px 0 rgba(255,255,255,0.2); }
+        .lego-progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--lego-dark); font-size: 0.7rem; font-weight: 800; text-shadow: 0 1px 0 rgba(255,255,255,0.3); font-family: var(--font-lego); }
+        .lego-world-map { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; margin-bottom: 1.2rem; padding: 0.8rem 1.2rem; background: #d9d0c0; border-radius: 20px; border: 4px solid #b8ae9c; box-shadow: inset 0 -4px 0 #a89d8a; }
+        .world-btn { background: var(--lego-card-bg); border: 3px solid #b8ae9c; border-radius: 16px; padding: 0.5rem 1rem; color: var(--lego-dark); font-family: var(--font-lego); font-size: 0.6rem; font-weight: 800; cursor: pointer; transition: 0.15s; display: flex; flex-direction: column; align-items: center; gap: 0.1rem; min-width: 70px; box-shadow: 0 5px 0 #a89d8a, inset 0 2px 0 rgba(255,255,255,0.3); position: relative; text-transform: uppercase; letter-spacing: 0.5px; }
+        .world-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #a89d8a, inset 0 2px 0 rgba(255,255,255,0.3); }
+        .world-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #a89d8a, inset 0 2px 0 rgba(255,255,255,0.3); }
+        .world-btn.active { border-color: var(--lego-yellow); box-shadow: 0 5px 0 #a89d8a, 0 0 0 3px var(--lego-yellow), inset 0 2px 0 rgba(255,255,255,0.3); }
+        .world-btn .world-icon { font-size: 1.6rem; }
+        .world-btn .world-label { font-size: 0.45rem; color: #6b5f4e; font-weight: 700; }
+        .world-btn .world-check { font-size: 0.7rem; }
+        .world-btn.locked { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
+        .world-btn.locked:hover { transform: none; }
+        .world-btn.unlocked { border-color: var(--lego-green); }
+        .lego-content { background: #d9d0c0; border-radius: var(--border-radius-lg); padding: 1.5rem; border: 5px solid #b8ae9c; box-shadow: inset 0 -6px 0 #a89d8a, var(--lego-shadow); position: relative; min-height: 620px; overflow: hidden; }
+        .lego-content::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(0,0,0,0.03) 18px, rgba(0,0,0,0.03) 20px), repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(0,0,0,0.03) 18px, rgba(0,0,0,0.03) 20px); background-size: 20px 20px; border-radius: 20px; pointer-events: none; z-index: 0; }
+        .lego-helper { display: flex; align-items: center; gap: 0.8rem; background: rgba(255,255,255,0.85); border-radius: 16px; padding: 0.6rem 1.2rem; margin-bottom: 0.8rem; border: 3px solid #b8ae9c; box-shadow: inset 0 -3px 0 #a89d8a; position: relative; z-index: 1; flex-wrap: wrap; }
+        .lego-helper .helper-icon { font-size: 2.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); animation: brickBounce 1.5s ease-in-out infinite; flex-shrink: 0; }
+        @keyframes brickBounce { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-4px) rotate(2deg); } }
+        .lego-helper .helper-text { color: var(--lego-dark); font-size: 0.75rem; font-weight: 700; line-height: 1.6; font-family: var(--font-lego); }
+        .lego-helper .helper-text .highlight { color: var(--lego-red); background: var(--lego-yellow); padding: 0.05rem 0.4rem; border-radius: 6px; display: inline-block; }
+        .lego-tabs { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.8rem; position: relative; z-index: 1; }
+        .lego-tab { background: #ede8e0; border: 3px solid #b8ae9c; border-radius: 40px; padding: 0.4rem 1.5rem; color: #4a3f2f; font-family: var(--font-lego); font-size: 0.6rem; font-weight: 800; cursor: pointer; transition: 0.1s; box-shadow: 0 4px 0 #a89d8a, inset 0 2px 0 rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; }
+        .lego-tab:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #a89d8a; }
+        .lego-tab:active { transform: translateY(4px); box-shadow: 0 0px 0 #a89d8a; }
+        .lego-tab.active-tab { background: var(--lego-yellow); border-color: var(--lego-yellow-dark); color: var(--lego-dark); box-shadow: 0 4px 0 var(--lego-yellow-dark); }
+        .tab-panel { display: none; flex: 1; overflow-y: auto; max-height: 580px; padding-right: 0.3rem; position: relative; z-index: 1; }
+        .tab-panel.active-tab { display: flex; flex-direction: column; }
+        .tab-panel::-webkit-scrollbar { width: 6px; }
+        .tab-panel::-webkit-scrollbar-track { background: #ede8e0; border-radius: 10px; }
+        .tab-panel::-webkit-scrollbar-thumb { background: #b8ae9c; border-radius: 10px; border: 2px solid #a89d8a; }
+        .task-display { background: rgba(255,255,255,0.9); border-radius: 16px; padding: 0.8rem 1.2rem; margin-bottom: 0.8rem; border: 3px solid #b8ae9c; box-shadow: inset 0 -3px 0 #a89d8a; display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.8rem; flex-shrink: 0; }
+        .task-display .task-label { color: #4a3f2f; font-size: 0.6rem; font-weight: 800; font-family: var(--font-lego); }
+        .task-display .task-word { color: var(--lego-red); font-size: 1.2rem; font-weight: 900; background: var(--lego-yellow); padding: 0.15rem 1rem; border-radius: 12px; border: 3px solid var(--lego-yellow-dark); box-shadow: inset 0 -3px 0 var(--lego-yellow-dark); font-family: var(--font-lego); word-break: break-all; }
+        .task-display .task-hint { color: #6b5f4e; font-size: 0.55rem; font-weight: 600; font-family: var(--font-lego); word-break: break-word; }
+        .task-display .task-progress { color: #4a3f2f; font-size: 0.55rem; font-weight: 800; margin-left: auto; flex-shrink: 0; font-family: var(--font-lego); background: rgba(255,255,255,0.5); padding: 0.15rem 0.6rem; border-radius: 20px; }
+        .task-status-row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; margin-bottom: 0.5rem; flex-shrink: 0; }
+        .task-status-item { display: flex; align-items: center; gap: 0.3rem; font-family: var(--font-lego); font-size: 0.5rem; font-weight: 700; padding: 0.15rem 0.6rem; border-radius: 20px; border: 2px solid #b8ae9c; background: rgba(255,255,255,0.5); }
+        .task-status-item .status-icon { font-size: 0.7rem; }
+        .task-status-item.completed { background: #d4edda; border-color: var(--lego-green); color: #155724; }
+        .task-status-item.incomplete { background: #fff3cd; border-color: var(--lego-orange); color: #856404; }
+        .task-status-item.locked { background: #f0ebe3; border-color: #b8ae9c; color: #8a7e6b; }
+        .build-zone { background: #c9bfae; border-radius: 16px; padding: 0.8rem; border: 4px solid #b8ae9c; min-height: 70px; max-height: 100px; overflow-y: auto; display: flex; flex-wrap: wrap; align-items: center; align-content: center; gap: 0.5rem 0.7rem; margin-bottom: 0.5rem; box-shadow: inset 0 -4px 0 #a89d8a, inset 0 4px 12px rgba(0,0,0,0.05); position: relative; background-image: repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(0,0,0,0.04) 18px, rgba(0,0,0,0.04) 20px), repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(0,0,0,0.04) 18px, rgba(0,0,0,0.04) 20px); background-size: 20px 20px; flex-shrink: 0; }
+        .build-zone .placeholder { color: #8a7e6b; font-size: 0.7rem; font-weight: 700; width: 100%; text-align: center; padding: 0.3rem; font-family: var(--font-lego); }
+        .built-brick { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.7rem 0.25rem 0.6rem; border-radius: 6px 6px 3px 3px; font-family: var(--font-lego); font-size: 0.6rem; font-weight: 900; color: white; text-shadow: 0 2px 3px rgba(0,0,0,0.3); box-shadow: 0 5px 0 rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.25); cursor: grab; transition: 0.1s; position: relative; animation: brickPop 0.25s cubic-bezier(0.34,1.56,0.64,1); border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+        .built-brick::before { content: ''; position: absolute; top: 3px; left: 6px; right: 6px; height: 4px; background: repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0px, rgba(255,255,255,0.15) 4px, transparent 4px, transparent 8px); background-size: 10px 4px; opacity: 0.5; border-radius: 3px; }
+        .built-brick:active { cursor: grabbing; transform: scale(0.92); }
+        .built-brick .remove-btn { background: rgba(0,0,0,0.3); border: none; color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; line-height: 1; font-family: var(--font-lego); flex-shrink: 0; }
+        .built-brick .remove-btn:hover { background: rgba(0,0,0,0.6); transform: scale(1.1); }
+        .built-brick.color-root { background: var(--lego-red); box-shadow: 0 5px 0 var(--lego-red-dark), inset 0 2px 0 rgba(255,255,255,0.25); }
+        .built-brick.color-prefix { background: var(--lego-green); box-shadow: 0 5px 0 var(--lego-green-dark), inset 0 2px 0 rgba(255,255,255,0.25); }
+        .built-brick.color-suffix { background: var(--lego-orange); color: #1a1a1a; text-shadow: 0 1px 2px rgba(255,255,255,0.2); box-shadow: 0 5px 0 var(--lego-orange-dark), inset 0 2px 0 rgba(255,255,255,0.25); }
+        .built-brick.color-combining { background: var(--lego-blue); box-shadow: 0 5px 0 var(--lego-blue-dark), inset 0 2px 0 rgba(255,255,255,0.25); }
+        .built-brick.color-other { background: var(--lego-purple); box-shadow: 0 5px 0 var(--lego-purple-dark), inset 0 2px 0 rgba(255,255,255,0.25); }
+        @keyframes brickPop { 0% { transform: scale(0.5) rotate(-5deg); opacity: 0.2; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+        .brick-palette { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.6rem 0.8rem; background: #ede8e0; border-radius: 16px; margin: 0.3rem 0 0.5rem; min-height: 45px; max-height: 100px; overflow-y: auto; border: 3px solid #b8ae9c; box-shadow: inset 0 -3px 0 #a89d8a; align-content: flex-start; flex-shrink: 0; }
+        .brick-palette-title { width: 100%; font-weight: 800; font-size: 0.55rem; color: #4a3f2f; margin-bottom: 0.1rem; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-lego); }
+        .brick-palette-title i { color: var(--lego-red); }
+        .palette-brick { display: inline-block; padding: 0.25rem 0.8rem; border-radius: 6px 6px 3px 3px; font-family: var(--font-lego); font-size: 0.5rem; font-weight: 900; color: white; text-shadow: 0 2px 3px rgba(0,0,0,0.2); box-shadow: 0 4px 0 rgba(0,0,0,0.18), inset 0 2px 0 rgba(255,255,255,0.2); cursor: grab; transition: 0.12s; user-select: none; border: 1px solid rgba(255,255,255,0.05); position: relative; flex-shrink: 0; }
+        .palette-brick::before { content: ''; position: absolute; top: 3px; left: 6px; right: 6px; height: 4px; background: repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0px, rgba(255,255,255,0.15) 4px, transparent 4px, transparent 8px); background-size: 10px 4px; opacity: 0.4; border-radius: 3px; }
+        .palette-brick:active { cursor: grabbing; transform: scale(0.92); }
+        .palette-brick:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(0,0,0,0.18); }
+        .palette-brick.type-root { background: var(--lego-red); }
+        .palette-brick.type-prefix { background: var(--lego-green); }
+        .palette-brick.type-suffix { background: var(--lego-orange); color: #1a1a1a; text-shadow: 0 1px 2px rgba(255,255,255,0.15); }
+        .palette-brick.type-combining { background: var(--lego-blue); }
+        .palette-brick.type-other { background: var(--lego-purple); }
+        .breakdown-section { background: rgba(255,255,255,0.9); border-radius: 16px; padding: 0.8rem 1rem; margin: 0.3rem 0 0.5rem; border: 3px solid #b8ae9c; box-shadow: inset 0 -3px 0 #a89d8a; flex-shrink: 0; }
+        .breakdown-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.4rem; }
+        .breakdown-header .breakdown-label { color: #4a3f2f; font-size: 0.6rem; font-weight: 800; display: flex; align-items: center; gap: 0.3rem; font-family: var(--font-lego); }
+        .breakdown-header .breakdown-status { font-size: 0.45rem; padding: 0.1rem 0.6rem; border-radius: 20px; background: #ede8e0; color: #4a3f2f; font-weight: 700; font-family: var(--font-lego); border: 2px solid #b8ae9c; }
+        .breakdown-header .breakdown-status.completed { background: #d4edda; color: #155724; border-color: var(--lego-green); }
+        .breakdown-inputs { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 0.2rem 0; width: 100%; }
+        .breakdown-inputs .part-wrapper { display: flex; flex-direction: column; align-items: center; gap: 0.05rem; flex: 1; min-width: 70px; }
+        .breakdown-inputs .part-wrapper .part-label { font-size: 0.4rem; color: #6b5f4e; font-weight: 700; font-family: var(--font-lego); text-transform: uppercase; letter-spacing: 0.5px; }
+        .breakdown-inputs .part-input { width: 100%; min-width: 60px; padding: 0.4rem 0.4rem; border-radius: 10px; border: 3px solid #b8ae9c; font-family: var(--font-lego); font-size: 0.75rem; font-weight: 700; background: white; color: var(--lego-dark); text-align: center; outline: none; transition: 0.2s; box-shadow: inset 0 -3px 0 #a89d8a; }
+        .breakdown-inputs .part-input:focus { border-color: var(--lego-blue); box-shadow: 0 0 0 3px rgba(0,109,183,0.15), inset 0 -3px 0 #a89d8a; }
+        .breakdown-inputs .part-input.correct { border-color: var(--lego-green); background: #e8f5e9; }
+        .breakdown-inputs .part-input.wrong { border-color: var(--lego-red); background: #fce4ec; }
+        .breakdown-inputs .part-input:disabled { opacity: 0.5; cursor: not-allowed; }
+        .breakdown-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 0.4rem; }
+        .breakdown-actions .lego-btn { background: var(--lego-blue); border: none; border-radius: 40px; padding: 0.3rem 1.2rem; color: white; font-family: var(--font-lego); font-size: 0.5rem; font-weight: 800; cursor: pointer; transition: 0.1s; box-shadow: 0 4px 0 var(--lego-blue-dark); text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+        .breakdown-actions .lego-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--lego-blue-dark); }
+        .breakdown-actions .lego-btn:active { transform: translateY(4px); box-shadow: 0 0px 0 var(--lego-blue-dark); }
+        .breakdown-actions .lego-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .breakdown-actions .lego-btn.completed { background: var(--lego-green); box-shadow: 0 4px 0 var(--lego-green-dark); }
+        .breakdown-actions .lego-btn.reset-btn { background: var(--lego-orange); box-shadow: 0 4px 0 var(--lego-orange-dark); color: #1a1a1a; }
+        .breakdown-actions .lego-btn.reset-btn:hover { box-shadow: 0 6px 0 var(--lego-orange-dark); }
+        .breakdown-feedback { font-size: 0.45rem; padding: 0.15rem 0.6rem; border-radius: 20px; flex: 1; min-width: 80px; font-weight: 700; font-family: var(--font-lego); }
+        .breakdown-feedback.success { color: #155724; background: #d4edda; }
+        .breakdown-feedback.error { color: #721c24; background: #f8d7da; }
+        .breakdown-feedback.info { color: #0c5460; background: #d1ecf1; }
+        .lego-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 0.3rem; flex-shrink: 0; }
+        .lego-btn { background: var(--lego-red); border: none; border-radius: 40px; padding: 0.35rem 1rem; color: white; font-family: var(--font-lego); font-size: 0.5rem; font-weight: 800; cursor: pointer; transition: 0.1s; box-shadow: 0 4px 0 var(--lego-red-dark); display: inline-flex; align-items: center; gap: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+        .lego-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--lego-red-dark); }
+        .lego-btn:active { transform: translateY(4px); box-shadow: 0 0px 0 var(--lego-red-dark); }
+        .lego-btn.lego-btn-success { background: var(--lego-green); box-shadow: 0 4px 0 var(--lego-green-dark); }
+        .lego-btn.lego-btn-success:hover { box-shadow: 0 6px 0 var(--lego-green-dark); }
+        .lego-btn.lego-btn-primary { background: var(--lego-yellow); color: var(--lego-dark); box-shadow: 0 4px 0 var(--lego-yellow-dark); }
+        .lego-btn.lego-btn-primary:hover { box-shadow: 0 6px 0 var(--lego-yellow-dark); }
+        .lego-btn.lego-btn-secondary { background: #b8ae9c; color: var(--lego-dark); box-shadow: 0 4px 0 #a89d8a; }
+        .lego-btn.lego-btn-secondary:hover { box-shadow: 0 6px 0 #a89d8a; }
+        .lego-btn.lego-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .lego-feedback { padding: 0.25rem 0.8rem; border-radius: 40px; font-size: 0.5rem; font-weight: 700; flex: 1; min-width: 80px; border: 3px solid transparent; font-family: var(--font-lego); }
+        .lego-feedback.success { background: #d4edda; color: #155724; border-color: var(--lego-green); }
+        .lego-feedback.error { background: #f8d7da; color: #721c24; border-color: var(--lego-red); }
+        .lego-feedback.info { background: #d1ecf1; color: #0c5460; border-color: var(--lego-blue); }
+        .term-result { font-family: var(--font-lego); font-size: 0.8rem; font-weight: 900; color: var(--lego-dark); background: var(--lego-yellow); padding: 0.1rem 0.7rem; border-radius: 12px; border: 3px solid var(--lego-yellow-dark); box-shadow: inset 0 -3px 0 var(--lego-yellow-dark); display: inline-block; word-break: break-all; }
+        .term-display-row { margin-top: 0.3rem; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; flex-shrink: 0; }
+        .term-display-row .label { color: #4a3f2f; font-size: 0.5rem; font-weight: 700; font-family: var(--font-lego); }
+        .term-display-row .progress-text { color: #4a3f2f; font-size: 0.5rem; font-weight: 700; margin-left: auto; font-family: var(--font-lego); }
+        .model-reward { background: rgba(255,255,255,0.9); border-radius: 16px; padding: 0.5rem 1rem; margin: 0.3rem 0; border: 4px solid var(--lego-yellow); box-shadow: 0 6px 0 var(--lego-yellow-dark); display: none; align-items: center; gap: 0.8rem; flex-wrap: wrap; animation: rewardPop 0.6s cubic-bezier(0.34,1.56,0.64,1); flex-shrink: 0; }
+        .model-reward.show { display: flex; }
+        @keyframes rewardPop { 0% { transform: scale(0.5) rotate(-5deg); opacity: 0; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+        .model-reward .model-icon { font-size: 2rem; animation: starSpin 2s linear infinite; flex-shrink: 0; }
+        @keyframes starSpin { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.1); } 100% { transform: rotate(360deg) scale(1); } }
+        .model-reward .model-text { color: var(--lego-dark); font-size: 0.5rem; font-weight: 700; font-family: var(--font-lego); word-break: break-word; }
+        .model-reward .model-text .model-name { color: var(--lego-red); font-size: 0.6rem; }
+        .model-reward .model-text .model-desc { color: #6b5f4e; }
+        .study-section { margin-bottom: 0.6rem; }
+        .study-section h3 { color: var(--lego-red); font-size: 0.6rem; border-bottom: 3px solid var(--lego-yellow); padding-bottom: 0.15rem; margin-bottom: 0.3rem; font-family: var(--font-lego); display: flex; align-items: center; gap: 0.3rem; }
+        .study-section p, .study-section li { font-size: 0.5rem; line-height: 2; color: #1f1b16; font-family: var(--font-lego); word-break: break-word; }
+        .study-section ul { list-style: none; padding-left: 0; }
+        .study-section li { padding: 0.1rem 0.1rem 0.1rem 1.4rem; position: relative; border-bottom: 1px solid #ede8e0; }
+        .study-section li::before { content: "🧱"; position: absolute; left: 0; font-size: 0.6rem; }
+        .term-highlight { background: var(--lego-yellow); color: var(--lego-dark); padding: 0.05rem 0.3rem; border-radius: 6px; font-weight: 800; }
+        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.1rem 0.6rem; }
+        @media (max-width: 500px) { .grid-2col { grid-template-columns: 1fr; } }
+        .quiz-question { background: white; border-radius: 16px; padding: 0.5rem 0.8rem; margin-bottom: 0.5rem; border-left: 6px solid var(--lego-yellow); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .quiz-question p { color: var(--lego-dark); font-size: 0.55rem; font-weight: 700; margin-bottom: 0.3rem; font-family: var(--font-lego); word-break: break-word; }
+        .quiz-options label { display: flex; align-items: center; gap: 0.4rem; background: #f8f4ef; padding: 0.25rem 0.8rem; border-radius: 40px; border: 2px solid #ede8e0; cursor: pointer; margin-bottom: 0.2rem; color: #1f1b16; font-size: 0.45rem; transition: 0.1s; font-family: var(--font-lego); font-weight: 600; word-break: break-word; }
+        .quiz-options label:hover { border-color: var(--lego-blue); background: #eaf3fa; }
+        .quiz-options input[type="radio"] { accent-color: var(--lego-red); width: 14px; height: 14px; flex-shrink: 0; }
+        .quiz-feedback { margin-top: 0.25rem; padding: 0.1rem 0.6rem; border-radius: 40px; font-size: 0.45rem; font-weight: 700; font-family: var(--font-lego); }
+        .quiz-feedback.correct { color: #155724; background: #d4edda; }
+        .quiz-feedback.wrong { color: #721c24; background: #f8d7da; }
+        .quiz-progress { font-size: 0.4rem; color: #6b5f4e; margin-top: 0.15rem; font-family: var(--font-lego); font-weight: 600; }
+        @media (max-width: 768px) { body { padding: 1rem; } .lego-header { padding: 0.6rem 1.2rem; } .logo-text { font-size: 1.4rem; } .logo-text span { font-size: 1rem; } .logo-icon { font-size: 1.6rem; padding: 0.15rem 0.6rem; } .builder-badge { font-size: 0.65rem; padding: 0.3rem 1rem; } .lego-content { padding: 0.8rem; min-height: 500px; } .breakdown-section { padding: 0.5rem 0.7rem; } .breakdown-inputs .part-input { min-width: 50px; font-size: 0.65rem; padding: 0.3rem 0.25rem; } .task-display .task-word { font-size: 1rem; } .world-btn { min-width: 55px; padding: 0.35rem 0.5rem; } .world-btn .world-icon { font-size: 1.2rem; } .built-brick { font-size: 0.5rem; padding: 0.2rem 0.5rem; } .palette-brick { font-size: 0.45rem; padding: 0.2rem 0.5rem; } .lego-tab { font-size: 0.5rem; padding: 0.3rem 1rem; } .lego-btn { font-size: 0.4rem; padding: 0.25rem 0.7rem; } .term-result { font-size: 0.65rem; } .lego-helper .helper-text { font-size: 0.6rem; } .lego-helper .helper-icon { font-size: 1.8rem; } .breakdown-inputs .part-wrapper { min-width: 50px; } .brick-palette { max-height: 80px; } .build-zone { max-height: 80px; min-height: 50px; } .tab-panel { max-height: 450px; } .task-status-item { font-size: 0.4rem; padding: 0.1rem 0.4rem; } .lego-content { min-height: 450px; } }
+        @media (max-width: 480px) { .lego-header { flex-direction: column; text-align: center; padding: 0.5rem 0.6rem; } .logo-area { flex-wrap: wrap; justify-content: center; } .builder-badge { width: 100%; justify-content: center; font-size: 0.55rem; padding: 0.25rem 0.6rem; } .world-btn { min-width: 45px; padding: 0.2rem 0.25rem; } .world-btn .world-icon { font-size: 0.9rem; } .world-btn .world-label { font-size: 0.3rem; } .breakdown-inputs .part-input { min-width: 45px; font-size: 0.55rem; padding: 0.25rem 0.2rem; } .task-display .task-word { font-size: 0.65rem; padding: 0.1rem 0.4rem; } .breakdown-inputs { gap: 0.25rem; } .breakdown-inputs .part-wrapper { min-width: 45px; } .lego-content { padding: 0.4rem; min-height: 400px; } .lego-tab { font-size: 0.35rem; padding: 0.2rem 0.5rem; } .lego-btn { font-size: 0.35rem; padding: 0.2rem 0.5rem; } .term-result { font-size: 0.55rem; padding: 0.1rem 0.4rem; } .model-reward .model-icon { font-size: 1.5rem; } .lego-helper .helper-icon { font-size: 1.4rem; } .brick-palette { max-height: 65px; padding: 0.3rem 0.4rem; gap: 0.3rem; } .build-zone { max-height: 65px; min-height: 40px; padding: 0.3rem; gap: 0.3rem; } .built-brick { font-size: 0.4rem; padding: 0.12rem 0.35rem; } .palette-brick { font-size: 0.38rem; padding: 0.12rem 0.35rem; } .tab-panel { max-height: 300px; } .lego-progress { height: 20px; } .lego-progress-text { font-size: 0.5rem; } .task-status-item { font-size: 0.35rem; padding: 0.08rem 0.3rem; } .task-status-item .status-icon { font-size: 0.5rem; } .lego-content { min-height: 380px; } }
+    </style>
+</head>
+<body>
+<div class="lego-container">
+    <div class="lego-header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-cubes"></i></div>
+            <div class="logo-text">Med<span>Lego</span></div>
+        </div>
+        <div class="builder-badge">
+            <i class="fas fa-star"></i> <span id="starCount">0</span> Stars
+        </div>
+    </div>
+
+    <div class="lego-progress">
+        <div class="lego-progress-fill" id="progressBarFill"></div>
+        <span class="lego-progress-text" id="progressText">0%</span>
+    </div>
+
+    <div class="lego-world-map" id="worldMap"></div>
+
+    <div class="lego-helper">
+        <span class="helper-icon">🧱</span>
+        <span class="helper-text" id="helperText">
+            Welcome, <span class="highlight">Builder</span>!<br>
+            Complete each level to unlock the next world!
+        </span>
+    </div>
+
+    <div class="lego-content">
+        <div class="lego-tabs">
+            <button class="lego-tab active-tab" data-tab="build">🧱 Build</button>
+            <button class="lego-tab" data-tab="study">📖 Study</button>
+            <button class="lego-tab" data-tab="quiz">❓ Quiz</button>
+        </div>
+
+        <div class="tab-panel active-tab" id="buildPanel">
+            <div class="task-display" id="taskDisplay">
+                <span class="task-label">🎯 Build:</span>
+                <span class="task-word" id="taskWord">loading...</span>
+                <span class="task-hint" id="taskHint">(drag blocks OR type parts)</span>
+                <span class="task-progress" id="progressDisplay">1/4</span>
+            </div>
+
+            <div class="task-status-row" id="taskStatusRow">
+                <span class="task-status-item incomplete" id="dragStatus">
+                    <span class="status-icon">🧱</span> Drag-Build: <span id="dragStatusText">Incomplete</span>
+                </span>
+                <span class="task-status-item incomplete" id="typeStatus">
+                    <span class="status-icon">✏️</span> Type Parts: <span id="typeStatusText">Incomplete</span>
+                </span>
+                <span class="task-status-item locked" id="overallStatus">
+                    <span class="status-icon">🔒</span> Overall: <span id="overallStatusText">Locked</span>
+                </span>
+            </div>
+
+            <div class="build-zone" id="buildZone">
+                <span class="placeholder" id="buildPlaceholder">⬇️ Drag Lego blocks here to build the term</span>
+            </div>
+
+            <div class="brick-palette" id="brickPalette">
+                <span class="brick-palette-title"><i class="fas fa-cubes"></i> Lego Block Palette — drag any brick</span>
+            </div>
+
+            <div class="breakdown-section" id="breakdownSection">
+                <div class="breakdown-header">
+                    <span class="breakdown-label">✏️ Type each word part:</span>
+                    <span class="breakdown-status" id="breakdownStatus">⏳ Not Started</span>
+                </div>
+                <div class="breakdown-inputs" id="breakdownInputs"></div>
+                <div class="breakdown-actions">
+                    <button class="lego-btn" id="breakdownSubmitBtn">✓ Check Parts</button>
+                    <button class="lego-btn reset-btn" id="breakdownResetBtn">↺ Reset</button>
+                    <span class="breakdown-feedback info" id="breakdownFeedback">Type each part in the boxes above</span>
+                </div>
+            </div>
+
+            <div class="model-reward" id="modelReward">
+                <span class="model-icon" id="modelIcon">⭐</span>
+                <div class="model-text">
+                    <div class="model-name" id="modelName">Level Complete!</div>
+                    <div class="model-desc" id="modelDesc">You mastered this term!</div>
+                </div>
+            </div>
+
+            <div class="lego-controls">
+                <button class="lego-btn lego-btn-success" id="checkTermBtn">✓ Check Build</button>
+                <button class="lego-btn lego-btn-secondary" id="clearBuildBtn">✕ Clear</button>
+                <button class="lego-btn lego-btn-primary" id="nextTaskBtn" disabled>→ Next (Locked)</button>
+                <span class="lego-feedback info" id="buildFeedback">Complete BOTH tasks to unlock Next</span>
+            </div>
+
+            <div class="term-display-row">
+                <span class="label">Your term:</span>
+                <span class="term-result" id="termDisplay">(empty)</span>
+                <span class="progress-text" id="coinDisplay">⭐ 0</span>
+            </div>
+        </div>
+
+        <div class="tab-panel" id="studyPanel">
+            <div id="studyContent"></div>
+        </div>
+
+        <div class="tab-panel" id="quizPanel">
+            <div id="quizContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ============================================================
+        //  CHAPTER DATA — All parts correctly defined
+        // ============================================================
+        const CHAPTERS = {
+            1: {
+                title: 'World 1',
+                sub: 'Grassland',
+                icon: '🌿',
+                color: '#8bac0f',
+                tasks: [
+                    { word: 'lithiasis', parts: ['lith', 'iasis'], hint: 'stone + condition', model: { icon: '🪨', name: 'Kidney Stone', desc: 'You mastered lithiasis!' } },
+                    { word: 'psychology', parts: ['psych', 'o', 'logy'], hint: 'mind + study of', model: { icon: '🧠', name: 'Brain', desc: 'You mastered psychology!' } },
+                    { word: 'caudal', parts: ['caud', 'al'], hint: 'tail + pertaining to', model: { icon: '🦎', name: 'Tail', desc: 'You mastered caudal!' } },
+                    { word: 'oral', parts: ['or', 'al'], hint: 'mouth + pertaining to', model: { icon: '👄', name: 'Mouth', desc: 'You mastered oral!' } },
+                ],
+                parts: [
+                    { text: 'lith', type: 'root' }, { text: 'iasis', type: 'suffix' },
+                    { text: 'psych', type: 'root' }, { text: 'o', type: 'combining' },
+                    { text: 'logy', type: 'suffix' }, { text: 'caud', type: 'root' },
+                    { text: 'al', type: 'suffix' }, { text: 'or', type: 'root' },
+                    { text: 'cardi', type: 'combining' }, { text: 'gastr', type: 'combining' },
+                    { text: 'oste', type: 'combining' }, { text: 'chol', type: 'combining' },
+                    { text: 'anti-', type: 'prefix' }, { text: 'hyper-', type: 'prefix' },
+                    { text: 'pre-', type: 'prefix' }, { text: '-mania', type: 'suffix' },
+                    { text: '-itis', type: 'suffix' },
+                ],
+                study: `
+                    <div class="study-section"><h3>📌 Learning Objectives</h3><p>Recognize prefixes, suffixes, word roots, and combining forms.</p></div>
+                    <div class="study-section"><h3>🧩 Word Roots</h3><div class="grid-2col"><div><span class="term-highlight">lith</span> (stone)</div><div><span class="term-highlight">psych</span> (mind)</div><div><span class="term-highlight">caud</span> (tail)</div><div><span class="term-highlight">or</span> (mouth)</div></div></div>
+                    <div class="study-section"><h3>🔤 Prefixes</h3><p><span class="term-highlight">anti-</span> · <span class="term-highlight">hyper-</span> · <span class="term-highlight">pre-</span></p></div>
+                    <div class="study-section"><h3>🔤 Suffixes</h3><p><span class="term-highlight">-logy</span> (study of) · <span class="term-highlight">-mania</span> · <span class="term-highlight">-itis</span> (inflammation)</p></div>
+                `,
+                quiz: [
+                    { q: 'What does -logy mean?', options: ['study of', 'inflammation', 'pain', 'removal'], correct: 0 },
+                    { q: 'Which root means "stone"?', options: ['psych', 'lith', 'caud', 'or'], correct: 1 },
+                    { q: 'What is the plural of "diagnosis"?', options: ['diagnosises', 'diagnoses', 'diagnosi', 'diagnosa'], correct: 1 }
+                ]
+            },
+            2: {
+                title: 'World 2',
+                sub: 'Forest',
+                icon: '🌲',
+                color: '#00a651',
+                tasks: [
+                    { word: 'cardiology', parts: ['cardi', 'o', 'logy'], hint: 'heart + study of', model: { icon: '❤️', name: 'Heart', desc: 'You mastered cardiology!' } },
+                    { word: 'gastritis', parts: ['gastr', 'itis'], hint: 'stomach + inflammation', model: { icon: '🤢', name: 'Stomach', desc: 'You mastered gastritis!' } },
+                    { word: 'neurology', parts: ['neur', 'o', 'logy'], hint: 'nerve + study of', model: { icon: '🧬', name: 'Nerve Cell', desc: 'You mastered neurology!' } },
+                    { word: 'hepatitis', parts: ['hepat', 'itis'], hint: 'liver + inflammation', model: { icon: '🫁', name: 'Liver', desc: 'You mastered hepatitis!' } },
+                ],
+                parts: [
+                    { text: 'cardi', type: 'combining' }, { text: 'o', type: 'combining' },
+                    { text: 'logy', type: 'suffix' }, { text: 'gastr', type: 'combining' },
+                    { text: 'itis', type: 'suffix' }, { text: 'neur', type: 'combining' },
+                    { text: 'hepat', type: 'combining' }, { text: 'dermat', type: 'combining' },
+                    { text: 'oste', type: 'combining' }, { text: '-logist', type: 'suffix' },
+                    { text: '-ectomy', type: 'suffix' }, { text: '-plasty', type: 'suffix' },
+                    { text: '-tomy', type: 'suffix' }, { text: '-scopy', type: 'suffix' },
+                    { text: '-algia', type: 'suffix' }, { text: '-oma', type: 'suffix' },
+                    { text: '-pathy', type: 'suffix' }, { text: '-rrhea', type: 'suffix' },
+                ],
+                study: `
+                    <div class="study-section"><h3>📌 Learning Objectives</h3><p>Match medical specialists, identify surgical and diagnostic suffixes.</p></div>
+                    <div class="study-section"><h3>👨‍⚕️ Specialists</h3><p><span class="term-highlight">-logist</span> = specialist · <span class="term-highlight">-iatrician</span> = practitioner</p></div>
+                    <div class="study-section"><h3>🔬 Surgical Suffixes</h3><p><span class="term-highlight">-ectomy</span> removal · <span class="term-highlight">-plasty</span> repair · <span class="term-highlight">-tomy</span> incision</p></div>
+                `,
+                quiz: [
+                    { q: 'What does -centesis mean?', options: ['surgical puncture', 'removal', 'repair', 'viewing'], correct: 0 },
+                    { q: 'Which suffix means "specialist"?', options: ['-logy', '-logist', '-iatry', '-ic'], correct: 1 },
+                    { q: 'What does "rhinorrhea" mean?', options: ['runny nose', 'headache', 'fever', 'cough'], correct: 0 }
+                ]
+            },
+            3: {
+                title: 'World 3',
+                sub: 'Desert',
+                icon: '🏜️',
+                color: '#faa61a',
+                tasks: [
+                    { word: 'tachycardia', parts: ['tachy', 'cardi', 'ia'], hint: 'fast + heart + condition', model: { icon: '🏃', name: 'Running Heart', desc: 'You mastered tachycardia!' } },
+                    { word: 'bradycardia', parts: ['brady', 'cardi', 'ia'], hint: 'slow + heart + condition', model: { icon: '🐢', name: 'Slow Heart', desc: 'You mastered bradycardia!' } },
+                    { word: 'hypothyroidism', parts: ['hypo', 'thyroid', 'ism'], hint: 'below + thyroid + condition', model: { icon: '🦋', name: 'Thyroid', desc: 'You mastered hypothyroidism!' } },
+                    { word: 'hyperthyroidism', parts: ['hyper', 'thyroid', 'ism'], hint: 'excessive + thyroid + condition', model: { icon: '🔥', name: 'Overactive Thyroid', desc: 'You mastered hyperthyroidism!' } },
+                ],
+                parts: [
+                    { text: 'tachy', type: 'prefix' }, { text: 'brady', type: 'prefix' },
+                    { text: 'hyper', type: 'prefix' }, { text: 'hypo', type: 'prefix' },
+                    { text: 'cardi', type: 'combining' }, { text: 'thyroid', type: 'root' },
+                    { text: 'ia', type: 'suffix' }, { text: 'ism', type: 'suffix' },
+                    { text: 'mono-', type: 'prefix' }, { text: 'bi-', type: 'prefix' },
+                    { text: 'tri-', type: 'prefix' }, { text: 'pre-', type: 'prefix' },
+                    { text: 'post-', type: 'prefix' }, { text: 'inter-', type: 'prefix' },
+                    { text: 'intra-', type: 'prefix' }, { text: 'peri-', type: 'prefix' },
+                    { text: 'trans-', type: 'prefix' }, { text: 'erythr/o', type: 'combining' },
+                    { text: 'leuk/o', type: 'combining' }, { text: 'melan/o', type: 'combining' },
+                    { text: 'cyan/o', type: 'combining' }, { text: 'xanth/o', type: 'combining' },
+                    { text: '-cyte', type: 'suffix' }, { text: '-gram', type: 'suffix' },
+                    { text: '-scope', type: 'suffix' },
+                ],
+                study: `
+                    <div class="study-section"><h3>📌 Learning Objectives</h3><p>Use prefixes for numbers, quantities, position, and color.</p></div>
+                    <div class="study-section"><h3>🔢 Number Prefixes</h3><p><span class="term-highlight">mono-</span> one · <span class="term-highlight">bi-</span> two · <span class="term-highlight">tri-</span> three</p></div>
+                    <div class="study-section"><h3>🎨 Color Forms</h3><p><span class="term-highlight">erythr/o</span> red · <span class="term-highlight">leuk/o</span> white · <span class="term-highlight">melan/o</span> black</p></div>
+                `,
+                quiz: [
+                    { q: 'The prefix peri- means:', options: ['around', 'through', 'inside', 'near'], correct: 0 },
+                    { q: 'What does tachycardia mean?', options: ['slow heart', 'rapid heart', 'yellow skin', 'red cell'], correct: 1 },
+                    { q: 'Which prefix means "white"?', options: ['melan/o', 'erythr/o', 'leuk/o', 'xanth/o'], correct: 2 }
+                ]
+            },
+            4: {
+                title: 'World 4',
+                sub: 'Castle',
+                icon: '🏰',
+                color: '#7c5cbf',
+                tasks: [
+                    { word: 'radiography', parts: ['radi', 'o', 'graphy'], hint: 'radiant energy + recording', model: { icon: '📷', name: 'X-Ray', desc: 'You mastered radiography!' } },
+                    { word: 'sonography', parts: ['son', 'o', 'graphy'], hint: 'sound + recording', model: { icon: '🫀', name: 'Ultrasound', desc: 'You mastered sonography!' } },
+                    { word: 'chemotherapy', parts: ['chem', 'o', 'therapy'], hint: 'chemical + treatment', model: { icon: '💉', name: 'Chemo', desc: 'You mastered chemotherapy!' } },
+                    { word: 'pharmacology', parts: ['pharmac', 'o', 'logy'], hint: 'drug + study of', model: { icon: '💊', name: 'Pharmacy', desc: 'You mastered pharmacology!' } },
+                ],
+                parts: [
+                    { text: 'radi', type: 'combining' }, { text: 'son', type: 'combining' },
+                    { text: 'chem', type: 'combining' }, { text: 'pharmac', type: 'combining' },
+                    { text: 'o', type: 'combining' }, { text: 'graphy', type: 'suffix' },
+                    { text: 'therapy', type: 'suffix' }, { text: 'logy', type: 'suffix' },
+                    { text: 'ech/o', type: 'combining' }, { text: 'tom/o', type: 'combining' },
+                    { text: 'plast/o', type: 'combining' }, { text: 'therapeut/o', type: 'combining' },
+                    { text: 'tox/o', type: 'combining' }, { text: '-graph', type: 'suffix' },
+                    { text: '-metry', type: 'suffix' }, { text: '-scope', type: 'suffix' },
+                ],
+                study: `
+                    <div class="study-section"><h3>📌 Learning Objectives</h3><p>Identify signs vs symptoms, vital signs, and imaging procedures.</p></div>
+                    <div class="study-section"><h3>🩺 Diagnostic Basics</h3><p><span class="term-highlight">Diagnosis (Dx)</span> vs <span class="term-highlight">Prognosis</span></p></div>
+                    <div class="study-section"><h3>📷 Imaging</h3><p><span class="term-highlight">radi/o</span> radiant energy · <span class="term-highlight">son/o</span> sound · <span class="term-highlight">tom/o</span> to cut</p></div>
+                `,
+                quiz: [
+                    { q: 'To auscultate means to:', options: ['observe', 'feel', 'tap', 'listen'], correct: 3 },
+                    { q: 'What is an analgesic?', options: ['pain reliever', 'antibiotic', 'antifungal', 'antiviral'], correct: 0 },
+                    { q: 'Which uses sound waves?', options: ['radiography', 'sonography', 'fluoroscopy', 'PET'], correct: 1 }
+                ]
+            }
+        };
+
+        // ============================================================
+        //  STATE
+        // ============================================================
+        function loadProgress() {
+            try {
+                const saved = localStorage.getItem('medlego_progress');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    return data;
+                }
+            } catch (e) { console.warn('localStorage not available'); }
+            return { unlocked: [1], completedTasks: [], breakdownCompleted: [] };
+        }
+
+        function saveProgress() {
+            try {
+                const data = {
+                    unlocked: Array.from(unlockedChapters),
+                    completedTasks: Array.from(completedTasks),
+                    breakdownCompleted: Array.from(breakdownCompleted)
+                };
+                localStorage.setItem('medlego_progress', JSON.stringify(data));
+            } catch (e) { console.debug('Progress not saved'); }
+        }
+
+        let unlockedChapters = new Set([1]);
+        let completedTasks = new Set();
+        let breakdownCompleted = new Set();
+
+        const saved = loadProgress();
+        if (saved.unlocked) saved.unlocked.forEach(ch => unlockedChapters.add(ch));
+        if (saved.completedTasks) saved.completedTasks.forEach(t => completedTasks.add(t));
+        if (saved.breakdownCompleted) saved.breakdownCompleted.forEach(t => breakdownCompleted.add(t));
+
+        let currentChapter = 1;
+        let currentTab = 'build';
+        let quizState = {};
+        let builtParts = [];
+        let currentTaskIndex = 0;
+
+        // DOM refs
+        const worldMap = document.getElementById('worldMap');
+        const buildZone = document.getElementById('buildZone');
+        const buildPlaceholder = document.getElementById('buildPlaceholder');
+        const brickPalette = document.getElementById('brickPalette');
+        const buildFeedback = document.getElementById('buildFeedback');
+        const termDisplay = document.getElementById('termDisplay');
+        const taskWord = document.getElementById('taskWord');
+        const taskHint = document.getElementById('taskHint');
+        const progressDisplay = document.getElementById('progressDisplay');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const progressText = document.getElementById('progressText');
+        const coinDisplay = document.getElementById('coinDisplay');
+        const starCount = document.getElementById('starCount');
+        const helperText = document.getElementById('helperText');
+        const studyContent = document.getElementById('studyContent');
+        const quizContent = document.getElementById('quizContent');
+        const modelReward = document.getElementById('modelReward');
+        const modelIcon = document.getElementById('modelIcon');
+        const modelName = document.getElementById('modelName');
+        const modelDesc = document.getElementById('modelDesc');
+        const breakdownInputs = document.getElementById('breakdownInputs');
+        const breakdownSubmitBtn = document.getElementById('breakdownSubmitBtn');
+        const breakdownResetBtn = document.getElementById('breakdownResetBtn');
+        const breakdownFeedback = document.getElementById('breakdownFeedback');
+        const breakdownStatus = document.getElementById('breakdownStatus');
+        const nextTaskBtn = document.getElementById('nextTaskBtn');
+        const dragStatus = document.getElementById('dragStatus');
+        const typeStatus = document.getElementById('typeStatus');
+        const overallStatus = document.getElementById('overallStatus');
+        const dragStatusText = document.getElementById('dragStatusText');
+        const typeStatusText = document.getElementById('typeStatusText');
+        const overallStatusText = document.getElementById('overallStatusText');
+
+        // ============================================================
+        //  RENDER FUNCTIONS
+        // ============================================================
+
+        function renderWorldMap() {
+            let html = '';
+            const chapterKeys = Object.keys(CHAPTERS);
+            chapterKeys.forEach((key, index) => {
+                const ch = CHAPTERS[key];
+                const num = parseInt(key);
+                const unlocked = unlockedChapters.has(num);
+                const isActive = num === currentChapter;
+                const allTasksDone = ch.tasks.every((_, idx) => {
+                    const tk = `${num}-${idx}`;
+                    return completedTasks.has(tk) && breakdownCompleted.has(tk);
+                });
+
+                html += `
+                    <button class="world-btn ${unlocked ? 'unlocked' : 'locked'} ${isActive ? 'active' : ''}"
+                            data-chapter="${num}"
+                            ${!unlocked ? 'disabled' : ''}>
+                        <span class="world-icon">${ch.icon}</span>
+                        <span class="world-label">${ch.title}</span>
+                        <span class="world-check">${allTasksDone ? '⭐' : unlocked ? '🟢' : '🔒'}</span>
+                    </button>
+                `;
+            });
+            worldMap.innerHTML = html;
+
+            document.querySelectorAll('.world-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const ch = parseInt(this.dataset.chapter);
+                    if (unlockedChapters.has(ch)) {
+                        switchChapter(ch);
+                    }
+                });
+            });
+        }
+
+        function renderPalette(chapter) {
+            const data = CHAPTERS[chapter];
+            if (!data) return;
+            let html = `<span class="brick-palette-title"><i class="fas fa-cubes"></i> Lego Block Palette — drag any brick</span>`;
+            data.parts.forEach(p => {
+                const typeClass = 'type-' + p.type;
+                html += `<span class="palette-brick ${typeClass}" draggable="true" data-text="${p.text}" data-type="${p.type}">${p.text}</span>`;
+            });
+            brickPalette.innerHTML = html;
+            document.querySelectorAll('.palette-brick').forEach(el => {
+                el.addEventListener('dragstart', handleDragStart);
+                el.addEventListener('dragend', handleDragEnd);
+            });
+        }
+
+        function renderBreakdownInputs(task, taskKey) {
+            if (!task) return;
+            const parts = task.parts;
+            const isCompleted = breakdownCompleted.has(taskKey);
+            breakdownInputs.innerHTML = '';
+            parts.forEach((part, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'part-wrapper';
+                const label = document.createElement('span');
+                label.className = 'part-label';
+                label.textContent = `Part ${index + 1}`;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'part-input';
+                if (isCompleted) {
+                    input.className = 'part-input completed';
+                    input.value = part;
+                    input.disabled = true;
+                } else {
+                    input.placeholder = '?';
+                    input.dataset.index = index;
+                    input.dataset.expected = part;
+                    input.autocomplete = 'off';
+                    input.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            checkBreakdown();
+                        }
+                    });
+                }
+                wrapper.appendChild(label);
+                wrapper.appendChild(input);
+                breakdownInputs.appendChild(wrapper);
+            });
+            if (isCompleted) {
+                breakdownStatus.className = 'breakdown-status completed';
+                breakdownStatus.textContent = '✅ Done';
+                breakdownSubmitBtn.disabled = true;
+                breakdownSubmitBtn.className = 'lego-btn completed';
+                breakdownSubmitBtn.textContent = '✓ Done!';
+                setBreakdownFeedback('success', '🎉 Parts mastered!');
+            } else {
+                breakdownStatus.className = 'breakdown-status';
+                breakdownStatus.textContent = '⏳ In Progress';
+                breakdownSubmitBtn.disabled = false;
+                breakdownSubmitBtn.className = 'lego-btn';
+                breakdownSubmitBtn.textContent = '✓ Check Parts';
+                setBreakdownFeedback('info', 'Type each part in the boxes above');
+            }
+            updateTaskStatus();
+        }
+
+        function updateTaskStatus() {
+            const taskKey = `${currentChapter}-${currentTaskIndex}`;
+            const dragDone = completedTasks.has(taskKey);
+            const breakDone = breakdownCompleted.has(taskKey);
+
+            if (dragDone) {
+                dragStatus.className = 'task-status-item completed';
+                dragStatusText.textContent = '✅ Complete';
+            } else {
+                dragStatus.className = 'task-status-item incomplete';
+                dragStatusText.textContent = '⏳ Incomplete';
+            }
+
+            if (breakDone) {
+                typeStatus.className = 'task-status-item completed';
+                typeStatusText.textContent = '✅ Complete';
+            } else {
+                typeStatus.className = 'task-status-item incomplete';
+                typeStatusText.textContent = '⏳ Incomplete';
+            }
+
+            if (dragDone && breakDone) {
+                overallStatus.className = 'task-status-item completed';
+                overallStatusText.textContent = '✅ Mastered!';
+                nextTaskBtn.disabled = false;
+                nextTaskBtn.textContent = '→ Next';
+                nextTaskBtn.className = 'lego-btn lego-btn-primary';
+            } else {
+                overallStatus.className = 'task-status-item incomplete';
+                overallStatusText.textContent = '🔒 Need both';
+                nextTaskBtn.disabled = true;
+                nextTaskBtn.textContent = '→ Next (Locked)';
+                nextTaskBtn.className = 'lego-btn lego-btn-primary';
+            }
+        }
+
+        function setBreakdownFeedback(type, msg) {
+            breakdownFeedback.className = 'breakdown-feedback ' + type;
+            breakdownFeedback.textContent = msg;
+        }
+
+        // --- LOAD TASK: Reset everything for the new word ---
+        function loadTask(chapter, index) {
+            const data = CHAPTERS[chapter];
+            if (!data || !data.tasks || data.tasks.length === 0) return;
+            const tasks = data.tasks;
+            if (index >= tasks.length) {
+                // All tasks done
+                taskWord.textContent = '🎉 Level Complete!';
+                taskHint.textContent = 'You mastered this world!';
+                progressDisplay.textContent = 'Done! 🏆';
+                modelReward.classList.remove('show');
+                breakdownInputs.innerHTML = '<span style="color:#4a3f2f;font-size:0.6rem;font-weight:700;font-family:var(--font-lego);">✓ All words mastered!</span>';
+                breakdownSubmitBtn.disabled = true;
+                breakdownStatus.className = 'breakdown-status completed';
+                breakdownStatus.textContent = '✅ Done';
+                dragStatus.className = 'task-status-item completed';
+                dragStatusText.textContent = '✅ Complete';
+                typeStatus.className = 'task-status-item completed';
+                typeStatusText.textContent = '✅ Complete';
+                overallStatus.className = 'task-status-item completed';
+                overallStatusText.textContent = '🏆 World Complete!';
+                nextTaskBtn.disabled = true;
+                nextTaskBtn.textContent = '🏁 Complete';
+                nextTaskBtn.className = 'lego-btn lego-btn-success';
+
+                const nextChapter = chapter + 1;
+                if (nextChapter <= Object.keys(CHAPTERS).length && !unlockedChapters.has(nextChapter)) {
+                    unlockedChapters.add(nextChapter);
+                    saveProgress();
+                    renderWorldMap();
+                    helperText.innerHTML = `🎉 You beat <span class="highlight">${data.title}</span>!<br>World ${nextChapter} is now unlocked! 🚀`;
+                }
+                return;
+            }
+
+            const task = tasks[index];
+            const taskKey = `${chapter}-${index}`;
+
+            // --- RESET ALL BUILD STATE ---
+            currentTaskIndex = index;          // Update the index
+            builtParts = [];                   // Clear built parts
+            renderBuildZone();                 // Re-render the build zone (now empty)
+            modelReward.classList.remove('show');
+            setFeedback('info', `Build "${task.word}" — drag blocks AND type parts to master it`);
+
+            // Update the UI
+            taskWord.textContent = task.word;
+            taskHint.textContent = '💡 ' + task.hint;
+            progressDisplay.textContent = `${index+1}/${tasks.length}`;
+            updateCoinDisplay();
+
+            // Update breakdown inputs
+            renderBreakdownInputs(task, taskKey);
+
+            // Update task status
+            updateTaskStatus();
+
+            // Update helper text
+            const allDone = tasks.every((_, idx) => {
+                const tk = `${chapter}-${idx}`;
+                return completedTasks.has(tk) && breakdownCompleted.has(tk);
+            });
+            if (allDone && index >= tasks.length - 1) {
+                helperText.innerHTML = `🌟 You're mastering <span class="highlight">${data.title}</span>!<br>Complete all words to unlock the next world!`;
+            } else {
+                helperText.innerHTML = `🏗️ Build <span class="highlight">${task.word}</span><br>Drag blocks AND type parts to master it!`;
+            }
+
+            // If this task is already fully completed (e.g., from a reload), show reward
+            if (completedTasks.has(taskKey) && breakdownCompleted.has(taskKey)) {
+                setFeedback('success', `✅ You already mastered "${task.word}"! Click Next to continue.`);
+                showModelReward(task);
+            }
+        }
+
+        function renderBuildZone() {
+            const bricks = buildZone.querySelectorAll('.built-brick');
+            bricks.forEach(b => b.remove());
+
+            if (builtParts.length === 0) {
+                buildPlaceholder.style.display = 'block';
+            } else {
+                buildPlaceholder.style.display = 'none';
+                builtParts.forEach((p, index) => {
+                    const brick = document.createElement('span');
+                    brick.className = `built-brick color-${p.type}`;
+                    brick.draggable = true;
+                    brick.dataset.index = index;
+                    brick.dataset.text = p.text;
+                    brick.dataset.type = p.type;
+                    brick.innerHTML = `${p.text} <button class="remove-btn" data-index="${index}">×</button>`;
+                    brick.addEventListener('dragstart', handleDragStart);
+                    brick.addEventListener('dragend', handleDragEnd);
+                    buildZone.appendChild(brick);
+                });
+                buildZone.querySelectorAll('.remove-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const idx = parseInt(this.dataset.index);
+                        builtParts.splice(idx, 1);
+                        renderBuildZone();
+                        updateTermDisplay();
+                        setFeedback('info', 'Block removed.');
+                        modelReward.classList.remove('show');
+                        // If drag was previously complete, now it's not
+                        const taskKey = `${currentChapter}-${currentTaskIndex}`;
+                        if (completedTasks.has(taskKey)) {
+                            completedTasks.delete(taskKey);
+                            saveProgress();
+                            updateTaskStatus();
+                        }
+                    });
+                });
+            }
+            updateTermDisplay();
+        }
+
+        function updateTermDisplay() {
+            const term = builtParts.map(p => p.text).join('');
+            termDisplay.textContent = term || '(empty)';
+        }
+
+        function setFeedback(type, msg) {
+            buildFeedback.className = 'lego-feedback ' + type;
+            buildFeedback.textContent = msg;
+        }
+
+        function updateCoinDisplay() {
+            const total = completedTasks.size + breakdownCompleted.size;
+            starCount.textContent = total;
+            coinDisplay.textContent = `⭐ ${total}`;
+            const totalTasks = Object.values(CHAPTERS).reduce((sum, ch) => sum + ch.tasks.length, 0);
+            const totalCompleted = completedTasks.size + breakdownCompleted.size;
+            const totalPossible = totalTasks * 2;
+            const pct = totalPossible > 0 ? Math.round((totalCompleted / totalPossible) * 100) : 0;
+            progressBarFill.style.width = Math.min(pct, 100) + '%';
+            progressText.textContent = Math.min(pct, 100) + '%';
+        }
+
+        function showModelReward(task) {
+            if (!task || !task.model) return;
+            modelIcon.textContent = task.model.icon;
+            modelName.textContent = task.model.name;
+            modelDesc.textContent = task.model.desc;
+            modelReward.classList.add('show');
+            modelReward.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => {
+                modelReward.classList.remove('show');
+            }, 4000);
+        }
+
+        // ============================================================
+        //  DRAG & DROP
+        // ============================================================
+        let draggedData = null;
+
+        function handleDragStart(e) {
+            const el = e.target.closest('[draggable]');
+            if (!el) return;
+            draggedData = { text: el.dataset.text, type: el.dataset.type };
+            e.dataTransfer.effectAllowed = 'copy';
+            e.dataTransfer.setData('text/plain', el.dataset.text);
+            el.style.opacity = '0.5';
+        }
+
+        function handleDragEnd(e) {
+            e.target.style.opacity = '1';
+            buildZone.classList.remove('drag-over');
+        }
+
+        buildZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+            this.classList.add('drag-over');
+        });
+
+        buildZone.addEventListener('dragleave', function(e) {
+            this.classList.remove('drag-over');
+        });
+
+        buildZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            if (!draggedData) return;
+            const data = CHAPTERS[currentChapter];
+            const task = data.tasks[currentTaskIndex];
+            if (!task) return;
+            if (builtParts.length >= task.parts.length) {
+                setFeedback('error', `⚠️ Only ${task.parts.length} parts needed. Clear some first.`);
+                draggedData = null;
+                return;
+            }
+            builtParts.push({ ...draggedData });
+            renderBuildZone();
+            setFeedback('info', `Added "${draggedData.text}"`);
+            modelReward.classList.remove('show');
+            // If drag was previously complete, now it's not
+            const taskKey = `${currentChapter}-${currentTaskIndex}`;
+            if (completedTasks.has(taskKey)) {
+                completedTasks.delete(taskKey);
+                saveProgress();
+                updateTaskStatus();
+            }
+            draggedData = null;
+        });
+
+        document.addEventListener('dragover', function(e) {
+            const zone = document.getElementById('buildZone');
+            const rect = zone.getBoundingClientRect();
+            if (e.clientX >= rect.left && e.clientX <= rect.right &&
+                e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            }
+        });
+        document.addEventListener('drop', function(e) {
+            const zone = document.getElementById('buildZone');
+            const rect = zone.getBoundingClientRect();
+            if (e.clientX >= rect.left && e.clientX <= rect.right &&
+                e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                if (!draggedData) return;
+                const data = CHAPTERS[currentChapter];
+                const task = data.tasks[currentTaskIndex];
+                if (!task) return;
+                if (builtParts.length >= task.parts.length) {
+                    setFeedback('error', `⚠️ Only ${task.parts.length} parts needed.`);
+                    draggedData = null;
+                    return;
+                }
+                builtParts.push({ ...draggedData });
+                renderBuildZone();
+                setFeedback('info', `Added "${draggedData.text}"`);
+                modelReward.classList.remove('show');
+                const taskKey = `${currentChapter}-${currentTaskIndex}`;
+                if (completedTasks.has(taskKey)) {
+                    completedTasks.delete(taskKey);
+                    saveProgress();
+                    updateTaskStatus();
+                }
+                draggedData = null;
+            }
+        });
+
+        // ============================================================
+        //  CHECK FUNCTIONS
+        // ============================================================
+
+        function checkDragBuild() {
+            const data = CHAPTERS[currentChapter];
+            if (!data) return false;
+            const task = data.tasks[currentTaskIndex];
+            if (!task) { setFeedback('error', 'No active task.'); return false; }
+            if (builtParts.length === 0) { setFeedback('error', '❗ Build something first!'); return false; }
+
+            const expected = task.parts;
+            const built = builtParts.map(p => p.text);
+            if (built.length !== expected.length) {
+                setFeedback('error', `❌ Need ${expected.length} part(s). You have ${built.length}.`);
+                return false;
+            }
+            for (let i = 0; i < expected.length; i++) {
+                if (built[i] !== expected[i]) {
+                    setFeedback('error', `❌ Expected: ${expected.join(' + ')}. Try again!`);
+                    return false;
+                }
+            }
+
+            const taskKey = `${currentChapter}-${currentTaskIndex}`;
+            completedTasks.add(taskKey);
+            saveProgress();
+            renderWorldMap();
+            updateCoinDisplay();
+            updateTaskStatus();
+            setFeedback('success', `✅ Drag-build correct! "${task.word}" built!`);
+
+            if (completedTasks.has(taskKey) && breakdownCompleted.has(taskKey)) {
+                showModelReward(task);
+                setFeedback('success', `🎉 You mastered "${task.word}" completely! Click Next to continue.`);
+                setTimeout(() => {
+                    if (completedTasks.has(taskKey) && breakdownCompleted.has(taskKey)) {
+                        const data2 = CHAPTERS[currentChapter];
+                        if (currentTaskIndex < data2.tasks.length - 1) {
+                            loadTask(currentChapter, currentTaskIndex + 1);
+                            setFeedback('info', 'Moving to next word...');
+                        } else {
+                            loadTask(currentChapter, currentTaskIndex + 1);
+                        }
+                    }
+                }, 2500);
+            } else {
+                setFeedback('success', '✅ Drag-build done! Now complete the Word Breakdown.');
+            }
+            return true;
+        }
+
+        function checkBreakdown() {
+            const data = CHAPTERS[currentChapter];
+            if (!data) return false;
+            const task = data.tasks[currentTaskIndex];
+            if (!task) { setBreakdownFeedback('error', 'No active task.'); return false; }
+
+            const taskKey = `${currentChapter}-${currentTaskIndex}`;
+            if (breakdownCompleted.has(taskKey)) {
+                setBreakdownFeedback('info', '✅ Already completed!');
+                return true;
+            }
+
+            const inputs = breakdownInputs.querySelectorAll('.part-input');
+            const expected = task.parts;
+            let allCorrect = true;
+            let hasEmpty = false;
+
+            inputs.forEach((input, index) => {
+                const value = input.value.trim();
+                const expectedPart = expected[index];
+                if (value === '') {
+                    hasEmpty = true;
+                    input.className = 'part-input wrong';
+                } else if (value.toLowerCase() === expectedPart.toLowerCase()) {
+                    input.className = 'part-input correct';
+                } else {
+                    input.className = 'part-input wrong';
+                    allCorrect = false;
+                }
+            });
+
+            if (hasEmpty) { setBreakdownFeedback('error', '⚠️ Fill all parts.'); return false; }
+            if (!allCorrect) { setBreakdownFeedback('error', '❌ Some parts wrong. Try again.'); return false; }
+
+            breakdownCompleted.add(taskKey);
+            saveProgress();
+            renderWorldMap();
+            updateCoinDisplay();
+            updateTaskStatus();
+            setBreakdownFeedback('success', '✅ All parts correct!');
+            renderBreakdownInputs(task, taskKey);
+
+            if (completedTasks.has(taskKey) && breakdownCompleted.has(taskKey)) {
+                showModelReward(task);
+                setFeedback('success', `🎉 You mastered "${task.word}" completely! Click Next to continue.`);
+                setTimeout(() => {
+                    if (completedTasks.has(taskKey) && breakdownCompleted.has(taskKey)) {
+                        const data2 = CHAPTERS[currentChapter];
+                        if (currentTaskIndex < data2.tasks.length - 1) {
+                            loadTask(currentChapter, currentTaskIndex + 1);
+                            setFeedback('info', 'Moving to next word...');
+                        } else {
+                            loadTask(currentChapter, currentTaskIndex + 1);
+                        }
+                    }
+                }, 2500);
+            } else {
+                setBreakdownFeedback('success', '✅ Word Breakdown done! Now build with blocks.');
+            }
+            return true;
+        }
+
+        // ============================================================
+        //  CONTROLS
+        // ============================================================
+        function clearBuild() {
+            builtParts = [];
+            renderBuildZone();
+            modelReward.classList.remove('show');
+            const taskKey = `${currentChapter}-${currentTaskIndex}`;
+            if (completedTasks.has(taskKey)) {
+                completedTasks.delete(taskKey);
+                saveProgress();
+                updateTaskStatus();
+            }
+            setFeedback('info', 'Cleared. Start building!');
+        }
+
+        function goToNextTask() {
+            const data = CHAPTERS[currentChapter];
+            if (!data || !data.tasks) return;
+            const taskKey = `${currentChapter}-${currentTaskIndex}`;
+
+            if (!completedTasks.has(taskKey) || !breakdownCompleted.has(taskKey)) {
+                setFeedback('error', '❌ Complete BOTH tasks before advancing!');
+                return;
+            }
+
+            if (currentTaskIndex < data.tasks.length - 1) {
+                loadTask(currentChapter, currentTaskIndex + 1);
+                setFeedback('info', 'Next word!');
+            } else {
+                loadTask(currentChapter, currentTaskIndex + 1);
+                setFeedback('info', '🎉 You completed all words in this world!');
+            }
+        }
+
+        function resetBreakdown() {
+            const data = CHAPTERS[currentChapter];
+            if (!data) return;
+            const task = data.tasks[currentTaskIndex];
+            if (!task) return;
+            const taskKey = `${currentChapter}-${currentTaskIndex}`;
+            if (breakdownCompleted.has(taskKey)) {
+                breakdownCompleted.delete(taskKey);
+                saveProgress();
+                renderBreakdownInputs(task, taskKey);
+                updateTaskStatus();
+                setBreakdownFeedback('info', 'Reset. Try typing the parts again.');
+                return;
+            }
+            const inputs = breakdownInputs.querySelectorAll('.part-input');
+            inputs.forEach(input => {
+                input.value = '';
+                input.className = 'part-input';
+            });
+            setBreakdownFeedback('info', 'Reset. Type each part.');
+        }
+
+        // ============================================================
+        //  STUDY & QUIZ (abbreviated for space)
+        // ============================================================
+        function renderStudy(chapter) {
+            const data = CHAPTERS[chapter];
+            if (!data) return;
+            studyContent.innerHTML = data.study;
+        }
+
+        function renderQuiz(chapter) {
+            const data = CHAPTERS[chapter];
+            if (!data || !data.quiz) {
+                quizContent.innerHTML = `<p style="color:#6b5f4e;font-size:0.5rem;font-family:var(--font-lego);font-weight:700;">No quiz for this world.</p>`;
+                return;
+            }
+            const qData = data.quiz;
+            if (!quizState[chapter]) {
+                quizState[chapter] = { currentQ: 0, answered: false, selected: null };
+            }
+            const state = quizState[chapter];
+            const idx = state.currentQ;
+
+            if (idx >= qData.length) {
+                quizContent.innerHTML = `
+                    <div style="background:#d4edda;padding:0.6rem;border-radius:16px;border:3px solid var(--lego-green);">
+                        <p style="color:#155724;font-size:0.6rem;font-family:var(--font-lego);font-weight:800;">🎉 Quiz complete!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const question = qData[idx];
+            let optionsHtml = question.options.map((opt, oi) => {
+                const checked = (state.selected === oi) ? 'checked' : '';
+                return `<label><input type="radio" name="quizQ" value="${oi}" ${checked}> ${opt}</label>`;
+            }).join('');
+
+            let feedbackHtml = '';
+            if (state.answered) {
+                const isCorrect = (state.selected === question.correct);
+                feedbackHtml = `<div class="quiz-feedback ${isCorrect ? 'correct' : 'wrong'}">${isCorrect ? '✅ Correct!' : '❌ Try again.'}</div>`;
+            }
+
+            quizContent.innerHTML = `
+                <div class="quiz-question">
+                    <p><strong>Q${idx+1}:</strong> ${question.q}</p>
+                    <div class="quiz-options">${optionsHtml}</div>
+                    ${feedbackHtml}
+                </div>
+                <div class="lego-controls">
+                    <button class="lego-btn lego-btn-primary" id="quizSubmitBtn">${state.answered ? 'Next →' : 'Submit'}</button>
+                    <button class="lego-btn lego-btn-secondary" id="quizResetBtn">↺ Reset</button>
+                </div>
+                <div class="quiz-progress">${idx+1}/${qData.length}</div>
+            `;
+
+            document.getElementById('quizSubmitBtn').addEventListener('click', function() {
+                handleQuizSubmit(chapter);
+            });
+            document.getElementById('quizResetBtn').addEventListener('click', function() {
+                resetQuiz(chapter);
+            });
+            document.querySelectorAll('input[name="quizQ"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (!quizState[chapter].answered) {
+                        quizState[chapter].selected = parseInt(this.value);
+                    }
+                });
+            });
+        }
+
+        function handleQuizSubmit(chapter) {
+            const data = CHAPTERS[chapter];
+            const qData = data.quiz;
+            const state = quizState[chapter];
+            if (!state) return;
+            const idx = state.currentQ;
+            if (idx >= qData.length) return;
+
+            if (!state.answered) {
+                if (state.selected === null) { alert('Select an answer.'); return; }
+                state.answered = true;
+                renderQuiz(chapter);
+                return;
+            }
+            if (state.answered) {
+                const isCorrect = (state.selected === qData[idx].correct);
+                if (!isCorrect) {
+                    state.answered = false;
+                    state.selected = null;
+                    renderQuiz(chapter);
+                    return;
+                }
+                state.currentQ++;
+                state.answered = false;
+                state.selected = null;
+                renderQuiz(chapter);
+            }
+        }
+
+        function resetQuiz(chapter) {
+            if (quizState[chapter]) {
+                quizState[chapter] = { currentQ: 0, answered: false, selected: null };
+            }
+            renderQuiz(chapter);
+        }
+
+        // ============================================================
+        //  SWITCH CHAPTER / TAB
+        // ============================================================
+        function switchChapter(chapter) {
+            currentChapter = chapter;
+            builtParts = [];
+            currentTaskIndex = 0;
+            renderPalette(chapter);
+            renderBuildZone();
+            renderStudy(chapter);
+            modelReward.classList.remove('show');
+            const data = CHAPTERS[chapter];
+            if (data && data.tasks && data.tasks.length > 0) {
+                loadTask(chapter, 0);
+            }
+            renderWorldMap();
+            setFeedback('info', `🌍 ${data.title} loaded! Build the words to progress.`);
+            switchTab(currentTab);
+            updateCoinDisplay();
+            helperText.innerHTML = `🌍 Welcome to <span class="highlight">${data.title}</span>!<br>Complete all ${data.tasks.length} words to unlock the next world!`;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.lego-tab').forEach(t => {
+                t.classList.toggle('active-tab', t.dataset.tab === tab);
+            });
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active-tab'));
+
+            if (tab === 'build') {
+                document.getElementById('buildPanel').classList.add('active-tab');
+            } else if (tab === 'study') {
+                document.getElementById('studyPanel').classList.add('active-tab');
+                renderStudy(currentChapter);
+            } else if (tab === 'quiz') {
+                document.getElementById('quizPanel').classList.add('active-tab');
+                renderQuiz(currentChapter);
+            }
+        }
+
+        // ============================================================
+        //  EVENT LISTENERS
+        // ============================================================
+        document.querySelectorAll('.lego-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                switchTab(this.dataset.tab);
+            });
+        });
+
+        document.getElementById('checkTermBtn').addEventListener('click', checkDragBuild);
+        document.getElementById('clearBuildBtn').addEventListener('click', clearBuild);
+        nextTaskBtn.addEventListener('click', goToNextTask);
+        breakdownSubmitBtn.addEventListener('click', checkBreakdown);
+        breakdownResetBtn.addEventListener('click', resetBreakdown);
+
+        // ============================================================
+        //  SIMULATION
+        // ============================================================
+        function runSimulation() {
+            console.log('🧱 MedLego Full Simulation Running...');
+            let errors = [];
+            Object.keys(CHAPTERS).forEach(chKey => {
+                const ch = CHAPTERS[chKey];
+                const num = parseInt(chKey);
+                if (!ch.tasks || ch.tasks.length === 0) errors.push(`❌ Chapter ${num} has no tasks`);
+                if (!ch.parts || ch.parts.length === 0) errors.push(`❌ Chapter ${num} has no parts`);
+                if (ch.tasks) {
+                    ch.tasks.forEach((task, idx) => {
+                        if (!task.word) errors.push(`❌ Chapter ${num} task ${idx} missing word`);
+                        if (!task.parts || task.parts.length === 0) errors.push(`❌ Chapter ${num} task "${task.word}" missing parts`);
+                        if (task.parts) {
+                            task.parts.forEach(part => {
+                                if (!ch.parts.some(p => p.text === part)) {
+                                    errors.push(`❌ Chapter ${num} task "${task.word}" uses part "${part}" not in palette`);
+                                }
+                            });
+                            const formed = task.parts.join('');
+                            if (formed !== task.word) {
+                                errors.push(`❌ Chapter ${num} task "${task.word}" does not match parts: ${task.parts.join(' + ')} = "${formed}"`);
+                            } else {
+                                console.log(`✅ Chapter ${num}: "${task.word}" = ${task.parts.join(' + ')}`);
+                            }
+                        }
+                    });
+                }
+            });
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            if (errors.length === 0) {
+                console.log('✅ ALL TESTS PASSED!');
+                console.log(`✅ ${Object.keys(CHAPTERS).length} chapters loaded`);
+                console.log(`✅ ${Object.values(CHAPTERS).reduce((sum, ch) => sum + ch.tasks.length, 0)} total words`);
+                console.log('✅ All word parts verified correctly!');
+            } else {
+                console.error('❌ ERRORS FOUND:', errors);
+            }
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        }
+
+        // ============================================================
+        //  INIT
+        // ============================================================
+        switchChapter(1);
+        switchTab('build');
+        renderWorldMap();
+        updateCoinDisplay();
+        setTimeout(runSimulation, 800);
+
+        console.log('🧱 MedLego — Build medical terms with Lego bricks!');
+        console.log('🌍 Complete BOTH tasks to master each word!');
+        console.log('💾 Progress saved in your browser.');
+    })();
+</script>
+</body>
+</html>
